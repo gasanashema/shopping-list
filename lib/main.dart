@@ -26,8 +26,19 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+class Item {
+  Item({required this.name, this.isBought = false});
+
+  String name;
+  bool isBought;
+}
+
 class _HomeScreenState extends State<HomeScreen> {
-  final items = ['Milk', 'Bread', 'Rice'];
+  final List<Item> items = [
+    Item(name: 'Milk'),
+    Item(name: 'Bread'),
+    Item(name: 'Rice'),
+  ];
   final controller = TextEditingController();
 
   void addItem() {
@@ -38,14 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       return;
     }
-    if (items.contains(text)) {
+    if (items.any((item) => item.name == text)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('$text is already on the list')),
       );
       return;
     }
     setState(() {
-      items.add(text);
+      items.add(Item(name: text));
     });
     controller.clear();
   }
@@ -55,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
     controller.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,27 +93,49 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: const Icon(Icons.shopping_basket),
-                  title: Text(items[index]),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    onPressed: () {
-                      final removedItem = items[index];
-                      setState(() {
-                        items.removeAt(index);
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('$removedItem removed')),
+            child: items.isEmpty
+                ? const Center(
+                    child: Text(
+                      'Your list is empty',
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      return ListTile(
+                        leading: const Icon(Icons.shopping_basket),
+                        title: Text(
+                          item.name,
+                          style: TextStyle(
+                            decoration: item.isBought
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            item.isBought = !item.isBought;
+                          });
+                        },
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: () {
+                            final removedItem = items[index];
+                            setState(() {
+                              items.removeAt(index);
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${removedItem.name} removed'),
+                              ),
+                            );
+                          },
+                        ),
                       );
                     },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),
