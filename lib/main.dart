@@ -170,13 +170,23 @@ class _HomeScreenState extends State<HomeScreen> {
                             IconButton(
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () {
-                                final removedItem = items[index];
+                                final removedItem = item;
+                                final removedIndex = items.indexOf(item);
                                 setState(() {
-                                  items.removeAt(index);
+                                  items.removeAt(removedIndex);
                                 });
+                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text('${removedItem.name} removed'),
+                                    action: SnackBarAction(
+                                      label: 'Undo',
+                                      onPressed: () {
+                                        setState(() {
+                                          items.insert(removedIndex, removedItem);
+                                        });
+                                      },
+                                    ),
                                   ),
                                 );
                               },
