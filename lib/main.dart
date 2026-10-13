@@ -86,6 +86,19 @@ class _HomeScreenState extends State<HomeScreen> {
     controller.clear();
   }
 
+  void openEditSheet(Item item) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => EditItemBottomSheet(item: item),
+    ).then((_) {
+      setState(() {});
+    });
+  }
+
   @override
   void dispose() {
     controller.dispose();
@@ -126,7 +139,14 @@ class _HomeScreenState extends State<HomeScreen> {
         itemBuilder: (context, index) {
           final item = shown[index];
           return ListTile(
-            leading: const Icon(Icons.shopping_basket),
+            leading: Checkbox(
+              value: item.isBought,
+              onChanged: (bool? value) {
+                setState(() {
+                  item.isBought = value ?? false;
+                });
+              },
+            ),
             title: Text(
               item.name,
               style: TextStyle(
@@ -140,11 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ? item.category
                   : '${item.category} · ${item.note}',
             ),
-            onTap: () {
-              setState(() {
-                item.isBought = !item.isBought;
-              });
-            },
+            onTap: () => openEditSheet(item),
             onLongPress: () {
               Navigator.push(
                 context,
@@ -396,6 +412,162 @@ class _DetailsScreenState extends State<DetailsScreen> {
             FilledButton(
               onPressed: save,
               child: const Text('Save'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EditItemBottomSheet extends StatefulWidget {
+  const EditItemBottomSheet({super.key, required this.item});
+
+  final Item item;
+
+  @override
+  State<EditItemBottomSheet> createState() => _EditItemBottomSheetState();
+}
+
+class _EditItemBottomSheetState extends State<EditItemBottomSheet> {
+  late final TextEditingController nameController;
+  late final TextEditingController noteController;
+  late String selectedCategory;
+  late bool isBought;
+
+  @override
+  void initState() {
+    super.initState();
+    nameController = TextEditingController(text: widget.item.name);
+    noteController = TextEditingController(text: widget.item.note);
+    selectedCategory = widget.item.category;
+    isBought = widget.item.isBought;
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    noteController.dispose();
+    super.dispose();
+  }
+
+  void save() {
+    final name = nameController.text.trim();
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Name cannot be empty')),
+      );
+      return;
+    }
+    widget.item.name = name;
+    widget.item.note = noteController.text.trim();
+    widget.item.category = selectedCategory;
+    widget.item.isBought = isBought;
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 20,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Edit Product',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Product Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: noteController,
+              decoration: const InputDecoration(
+                labelText: 'Note',
+                hintText: 'e.g. the 1 litre bottle',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Category',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                ChoiceChip(
+                  label: const Text('Food'),
+                  selected: selectedCategory == 'Food',
+                  onSelected: (_) {
+                    setState(() {
+                      selectedCategory = 'Food';
+                    });
+                  },
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Drinks'),
+                  selected: selectedCategory == 'Drinks',
+                  onSelected: (_) {
+                    setState(() {
+                      selectedCategory = 'Drinks';
+                    });
+                  },
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Home'),
+                  selected: selectedCategory == 'Home',
+                  onSelected: (_) {
+                    setState(() {
+                      selectedCategory = 'Home';
+                    });
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Mark as bought'),
+              value: isBought,
+              onChanged: (val) {
+                setState(() {
+                  isBought = val;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: save,
+              icon: const Icon(Icons.check),
+              label: const Text('Save Changes'),
             ),
           ],
         ),
