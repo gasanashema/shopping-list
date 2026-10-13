@@ -31,11 +31,15 @@ class Item {
     required this.name,
     this.isBought = false,
     this.quantity = 1,
+    this.category = 'Food',
+    this.note = '',
   });
 
   String name;
   bool isBought;
   int quantity;
+  String category;
+  String note;
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -131,9 +135,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     : null,
               ),
             ),
+            subtitle: Text(
+              item.note.isEmpty
+                  ? item.category
+                  : '${item.category} · ${item.note}',
+            ),
             onTap: () {
               setState(() {
                 item.isBought = !item.isBought;
+              });
+            },
+            onLongPress: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailsScreen(item: item),
+                ),
+              ).then((_) {
+                setState(() {});
               });
             },
             trailing: Row(
@@ -259,6 +278,127 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 8),
           Expanded(child: content),
         ],
+      ),
+    );
+  }
+}
+
+class DetailsScreen extends StatefulWidget {
+  const DetailsScreen({super.key, required this.item});
+
+  final Item item;
+
+  @override
+  State<DetailsScreen> createState() => _DetailsScreenState();
+}
+
+class _DetailsScreenState extends State<DetailsScreen> {
+  late final TextEditingController nameController;
+  late final TextEditingController noteController;
+  late String selectedCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    nameController = TextEditingController(text: widget.item.name);
+    noteController = TextEditingController(text: widget.item.note);
+    selectedCategory = widget.item.category;
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    noteController.dispose();
+    super.dispose();
+  }
+
+  void save() {
+    final name = nameController.text.trim();
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Name cannot be empty')),
+      );
+      return;
+    }
+    widget.item.name = name;
+    widget.item.note = noteController.text.trim();
+    widget.item.category = selectedCategory;
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Item details'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: noteController,
+              decoration: const InputDecoration(
+                labelText: 'Note',
+                hintText: 'e.g. the 1 litre bottle',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Category',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                ChoiceChip(
+                  label: const Text('Food'),
+                  selected: selectedCategory == 'Food',
+                  onSelected: (_) {
+                    setState(() {
+                      selectedCategory = 'Food';
+                    });
+                  },
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Drinks'),
+                  selected: selectedCategory == 'Drinks',
+                  onSelected: (_) {
+                    setState(() {
+                      selectedCategory = 'Drinks';
+                    });
+                  },
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Home'),
+                  selected: selectedCategory == 'Home',
+                  onSelected: (_) {
+                    setState(() {
+                      selectedCategory = 'Home';
+                    });
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            FilledButton(
+              onPressed: save,
+              child: const Text('Save'),
+            ),
+          ],
+        ),
       ),
     );
   }
