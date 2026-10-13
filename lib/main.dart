@@ -27,10 +27,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class Item {
-  Item({required this.name, this.isBought = false});
+  Item({
+    required this.name,
+    this.isBought = false,
+    this.quantity = 1,
+  });
 
   String name;
   bool isBought;
+  int quantity;
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -119,19 +124,49 @@ class _HomeScreenState extends State<HomeScreen> {
                             item.isBought = !item.isBought;
                           });
                         },
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () {
-                            final removedItem = items[index];
-                            setState(() {
-                              items.removeAt(index);
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${removedItem.name} removed'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove),
+                              onPressed: () {
+                                if (item.quantity > 1) {
+                                  setState(() {
+                                    item.quantity--;
+                                  });
+                                }
+                              },
+                            ),
+                            Text(
+                              '${item.quantity}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
-                            );
-                          },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.add),
+                              onPressed: () {
+                                setState(() {
+                                  item.quantity++;
+                                });
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              onPressed: () {
+                                final removedItem = items[index];
+                                setState(() {
+                                  items.removeAt(index);
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('${removedItem.name} removed'),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       );
                     },
