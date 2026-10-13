@@ -35,12 +35,11 @@ A Flutter shopping list application enhanced with item quantities, duplicate han
 - If a filter view has no matching items (while the list overall is not empty), the app displays `"Nothing here"`.
 - All operations (marking as bought/unbought, quantity changes, deleting, and undoing) work consistently across all filter views.
 
-### 6. Item Details (Editing Details & Categories)
-- Long-pressing any item navigates to a dedicated **Item details** screen with a top AppBar and back arrow.
-- Allows editing the item's **Name** and adding a **Note** (e.g., `the 1 litre bottle`).
-- Includes category selection using choice chips: **Food**, **Drinks**, and **Home**.
-- Tapping **Save** validates that the name is not empty, applies the changes, and returns to the home screen.
-- Tapping the back arrow cancels and discards changes without altering the item.
+### 6. Item Details & Offcanvas Quick Edit Form
+- **Tap to Edit (Offcanvas Form)**: Tapping on any item opens a sleek modal bottom sheet (offcanvas form) allowing quick editing of the item's name, note, category chips (**Food**, **Drinks**, **Home**), and a toggle to mark as bought/unbought.
+- **Checkbox for Status**: Each item has a leading checkbox that toggles its bought status directly from the list without opening the edit sheet.
+- **Full Screen Details**: Long-pressing an item navigates to the full **Item details** screen with a top AppBar and back arrow.
+- Tapping **Save** / **Save Changes** validates that the name is not empty and saves the changes.
 - The main list displays the category and note underneath each item name (e.g., `Drinks · the 1 litre bottle`).
 
 ---
