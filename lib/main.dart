@@ -54,12 +54,27 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       return;
     }
-    if (items.any((item) => item.name == text)) {
+
+    final matches = items.where(
+      (item) => item.name.trim().toLowerCase() == text.toLowerCase(),
+    );
+    if (matches.isNotEmpty) {
+      final existing = matches.first;
+      setState(() {
+        existing.quantity++;
+      });
+      controller.clear();
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$text is already on the list')),
+        SnackBar(
+          content: Text(
+            '${existing.name} is already on the list: now ×${existing.quantity}',
+          ),
+        ),
       );
       return;
     }
+
     setState(() {
       items.add(Item(name: text));
     });
