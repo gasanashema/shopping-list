@@ -75,10 +75,15 @@ Flutter's rendering pipeline only triggers a rebuild when a widget's `State` exp
 
 ## Screenshots
 
-| Quantities | Undo Message |
+| All Items | Quantities |
 |:---:|:---:|
-| ![Quantities](screenshots/quantities.png) | ![Undo Message](screenshots/undo.png) |
+| ![All Items](screenshots/all%20items.png) | ![Quantities](screenshots/quantities.png) |
 
-| Bought Filter | Item Details |
+| Undo Message | Bought Filter |
 |:---:|:---:|
-| ![Bought Filter](screenshots/bought_filter.png) | ![Item Details](screenshots/item_details.png) |
+| ![Undo Message](screenshots/undo.png) | ![Bought Filter](screenshots/bought_filter.png) |
+
+| Item Details & Quick Edit |
+|:---:|
+| ![Item Details](screenshots/item_details.png) |
+
